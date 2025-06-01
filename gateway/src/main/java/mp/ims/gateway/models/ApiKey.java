@@ -2,6 +2,7 @@ package mp.ims.gateway.models;
 
 import jakarta.persistence.*;
 
+import java.time.Duration;
 import java.time.Instant;
 
 @Entity
@@ -9,7 +10,7 @@ import java.time.Instant;
 public class ApiKey {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     private Boolean revoked;
     private Instant createdAt;
@@ -23,9 +24,12 @@ public class ApiKey {
     @JoinColumn(name = "user_id")
     User user;
 
+
     @PrePersist
     protected void onCreate() {
-        createdAt = updatedAt = Instant.now(); // UTC
+        revoked = false;
+        createdAt = updatedAt = Instant.now();// UTC
+        expiresAt = Instant.now().plus(Duration.ofDays(30));
     }
 
     @PreUpdate
@@ -35,12 +39,8 @@ public class ApiKey {
 
 
 
-    public Integer getId() {
+    public Long getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public Boolean getRevoked() {

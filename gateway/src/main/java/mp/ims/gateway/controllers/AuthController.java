@@ -1,5 +1,6 @@
 package mp.ims.gateway.controllers;
 
+import mp.ims.gateway.DTO.ServiceAclPermissionDTO;
 import mp.ims.gateway.models.User;
 import mp.ims.gateway.services.ApiKeyService;
 import mp.ims.gateway.services.JwtService;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -37,15 +40,20 @@ public class AuthController {
 
         String hash = apiKeyUtil.generateHMAC_SHA256(key);
 
-        System.out.println(hash);
-
         Optional<User> u = apiKeyService.getUserByApiKey(hash);
         if(u.isEmpty()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid API Key or API key has been revoked or expired !!!");
 
         var opt = userService.getUserWithPermissions(u.get().getId());
         //if(opt.isEmpty()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid API Key");
 
-        String token = jwtService.generateToken(u.get(), opt.get().get(u.get()));
+        List<ServiceAclPermissionDTO> val = null;
+
+        if(!opt.get().isEmpty()){
+            var entry = opt.get().entrySet().iterator().next();
+            val = entry.getValue();
+        }
+
+        String token = jwtService.generateToken(u.get(), val);
 
         return ResponseEntity.ok(token);
 

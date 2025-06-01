@@ -10,14 +10,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserDao extends JpaRepository<User, Integer> {
+public interface UserDao extends JpaRepository<User, Long> {
 
     Optional<User> findByName(String name);
 
     Optional<User> findByEmail(String email);
 
     @Query(value = """
-                        SELECT u.name, u.id, u.email, u.role,
+                        SELECT u.id, u.name, u.email, u.role,
                                m.name AS serviceName,
                                a.can_read,
                                a.can_write
@@ -26,5 +26,5 @@ public interface UserDao extends JpaRepository<User, Integer> {
                         LEFT JOIN microservices m ON m.id = a.service_id
                         WHERE u.id = ?1
                     """, nativeQuery = true)
-    List<UserPermissionDTO> fetchUserWithPermissions(Integer id);
+    List<UserPermissionDTO> fetchUserWithPermissions(Long id);
 }

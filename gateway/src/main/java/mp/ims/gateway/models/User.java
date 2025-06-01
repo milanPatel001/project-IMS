@@ -10,7 +10,7 @@ import java.time.Instant;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "org_id")
@@ -29,7 +29,13 @@ public class User {
     public User() {
     }
 
-    public User(Integer id, String name, String email, String role) {
+    public User(String name, String email, String role) {
+        this.name = name;
+        this.email = email;
+        this.role = role;
+    }
+
+    public User(Long id, String name, String email, String role) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -47,12 +53,8 @@ public class User {
     }
 
 
-    public Integer getId() {
+    public Long getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public Organization getOrganization() {

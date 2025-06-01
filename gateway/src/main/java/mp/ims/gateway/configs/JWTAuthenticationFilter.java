@@ -1,6 +1,8 @@
 package mp.ims.gateway.configs;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
@@ -38,17 +41,23 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = header.split(" ")[1].trim();
+        Claims claims;
+        try {
+            claims = jwtService.extractAllClaims(token);
+        }catch (MalformedJwtException | ExpiredJwtException m){
+            System.out.println(m.getMessage());
+            filterChain.doFilter(request, response);
+            return;
+        }
 
 
-        Claims claims = jwtService.extractAllClaims(token);
-
-        CustomUserDetails c = new CustomUserDetails(claims.get("org_id", Integer.class), claims.getSubject(), claims.get("permissions", List.class), claims.get("role", String.class));
+        CustomUserDetails c = new CustomUserDetails(claims.get("org_id", Long.class), claims.getSubject(),(List<Map<String, Object>>) claims.get("permissions"), claims.get("role", String.class));
 
         if(SecurityContextHolder.getContext().getAuthentication()==null && jwtService.isTokenValid(token, c)){
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(c, null, c.getAuthorities());
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
             SecurityContextHolder.getContext().setAuthentication(authToken);
+            System.out.println("SUCCEEDED");
         }
 
         filterChain.doFilter(request, response);

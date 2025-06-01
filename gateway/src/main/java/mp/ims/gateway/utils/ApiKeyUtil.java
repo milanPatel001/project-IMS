@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
+import java.util.UUID;
 
 @Component
 public class ApiKeyUtil {
@@ -29,4 +30,9 @@ public class ApiKeyUtil {
         String computedHash = generateHMAC_SHA256(apiKey);
         return computedHash.equals(storedHash);
     }
+
+    public static String generateApiKey() {
+        return UUID.randomUUID().toString();
+    }
+
 }

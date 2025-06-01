@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ApiKeyDao extends JpaRepository<ApiKey, Integer> {
+public interface ApiKeyDao extends JpaRepository<ApiKey, Long> {
     Optional<ApiKey> findByKeyHash(String hash);
 }

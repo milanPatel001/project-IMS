@@ -5,23 +5,36 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class CustomUserDetails implements UserDetails {
 
-    private final Integer orgId;
+    private final Long orgId;
     private final String userId;
     private final List<ServiceAclPermissionDTO> permissions;
     private final String role;
 
-    public CustomUserDetails(Integer orgId, String userId, List<ServiceAclPermissionDTO> permissions, String role) {
+    public CustomUserDetails(Long orgId, String userId, List<Map<String, Object>> permissions, String role) {
         this.orgId = orgId;
         this.userId = userId;
-        this.permissions = permissions;
+
+        this.permissions =  permissions.stream()
+                            .map(map -> new ServiceAclPermissionDTO(
+                                    (String) map.get("service"),
+                                    (Boolean) map.get("canRead"),
+                                    (Boolean) map.get("canWrite")
+                            ))
+                            .toList();
+
         this.role = role;
     }
+
+//    public CustomUserDetails(Long orgId, String userId, List<ServiceAclPermissionDTO> permissions, String role) {
+//        this.orgId = orgId;
+//        this.userId = userId;
+//        this.permissions = permissions;
+//        this.role = role;
+//    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -53,7 +66,7 @@ public class CustomUserDetails implements UserDetails {
         return l;
     }
 
-    public Integer getOrgId() {
+    public Long getOrgId() {
         return orgId;
     }
 

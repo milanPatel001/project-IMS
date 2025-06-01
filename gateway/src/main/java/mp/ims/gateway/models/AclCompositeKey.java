@@ -5,13 +5,13 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class AclCompositeKey implements Serializable {
-    Integer userId;
-    Integer serviceId;
+    Long userId;
+    Long serviceId;
 
     public AclCompositeKey() {
     }
 
-    public AclCompositeKey(Integer userId, Integer serviceId) {
+    public AclCompositeKey(Long userId, Long serviceId) {
         this.userId = userId;
         this.serviceId = serviceId;
     }

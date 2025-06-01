@@ -1,7 +1,9 @@
 package mp.ims.gateway.services;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import mp.ims.gateway.DTO.ServiceAclPermissionDTO;
@@ -50,14 +52,20 @@ public class JwtService {
                 .compact();
     }
 
-    public Claims extractAllClaims(String jwt) {
+    public Claims extractAllClaims(String jwt) throws MalformedJwtException, ExpiredJwtException {
         return Jwts.parser().verifyWith(this.key).build().parseSignedClaims(jwt).getPayload();
     }
 
 
     public boolean isTokenValid(String token, CustomUserDetails customUserDetails) {
-        Claims claims = extractAllClaims(token);
-        boolean isTokenExpired = claims.getExpiration().after(new Date());
+        Claims claims;
+        try {
+            claims = extractAllClaims(token);
+        }catch (MalformedJwtException m){
+            System.out.println(m.getMessage());
+            return false;
+        }
+        boolean isTokenExpired = claims.getExpiration().before(new Date());
 
         return String.valueOf(customUserDetails.getUserId()).equals(claims.getSubject()) && !isTokenExpired;
     }

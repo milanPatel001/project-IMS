@@ -3,7 +3,7 @@ package mp.ims.gateway.DTO;
 import java.util.List;
 
 public class UserPermissionDTO {
-    private Integer id;
+    private Long id;
     private String name;
     private String email;
     private String role;
@@ -11,7 +11,7 @@ public class UserPermissionDTO {
     private Boolean canRead;
     private Boolean canWrite;
 
-    public UserPermissionDTO(Integer id, String name, String email, String role, String serviceName, Boolean canRead, Boolean canWrite) {
+    public UserPermissionDTO(Long id, String name, String email, String role, String serviceName, Boolean canRead, Boolean canWrite) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -22,7 +22,7 @@ public class UserPermissionDTO {
     }
 
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

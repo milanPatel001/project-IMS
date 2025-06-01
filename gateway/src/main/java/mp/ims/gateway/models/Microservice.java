@@ -8,7 +8,7 @@ public class Microservice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(columnDefinition = "TEXT")
     private String name;
@@ -16,12 +16,8 @@ public class Microservice {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {
