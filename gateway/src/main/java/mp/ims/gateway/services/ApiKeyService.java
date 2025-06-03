@@ -12,6 +12,8 @@ import java.util.Optional;
 @Service
 public class ApiKeyService {
     private final ApiKeyDao apiKeyDao;
+    private static final Logger logger = LoggerFactory.getLogger(ApiKeyService.class);
+
 
     @Autowired
     public ApiKeyService(ApiKeyDao apiKeyDao) {
