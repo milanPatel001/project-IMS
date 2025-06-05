@@ -7,21 +7,19 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class KafkaProducer {
-    private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public KafkaProducer(KafkaTemplate<String, String> kafkaTemplate, ObjectMapper objectMapper) {
+    public KafkaProducer(KafkaTemplate<String, Object> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
-        this.objectMapper = objectMapper;
     }
 
     // blocks until ack
-    public boolean sendEvent(String tenantId, String eventType, String message) {
+    public boolean sendEvent(String tenantId, String eventType, Object message) {
         String topic = tenantId + "." + eventType;
 
         boolean isMessageRegistered = true;
         try {
-            SendResult<String, String> result = kafkaTemplate.send(topic, message).get();
+            SendResult<String, Object> result = kafkaTemplate.send(topic, message).get();
             System.out.println("Message sent successfully to topic: " + result.getRecordMetadata().topic() +
                     " at offset: " + result.getRecordMetadata().offset());
 
