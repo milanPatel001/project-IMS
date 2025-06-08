@@ -1,7 +1,6 @@
-package main
+package configs
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -30,8 +29,6 @@ func (ka *KafkaAdmin) GetMatchingTopicsBySuffixes(suffixes []string) ([]string, 
 		return nil, err
 	}
 
-	print(topics)
-
 	var matches []string
 	for topic := range topics {
 		for _, suffix := range suffixes {
@@ -52,7 +49,7 @@ func (ka *KafkaAdmin) ListTopics() error {
 	}
 
 	for topic, detail := range topics {
-		fmt.Printf("FOUND: Topic: %s | Partitions: %d | Replication: %d\n",
+		log.Printf("FOUND: Topic: %s | Partitions: %d | Replication: %d\n",
 			topic, detail.NumPartitions, detail.ReplicationFactor)
 	}
 
@@ -79,7 +76,7 @@ func (ka *KafkaAdmin) DescribeTopicConfig(name string) error {
 	}
 
 	for _, entry := range res {
-		fmt.Printf("%s = %s (default=%t)\n", entry.Name, entry.Value, entry.Default)
+		log.Printf("%s = %s (default=%t)\n", entry.Name, entry.Value, entry.Default)
 	}
 
 	return nil
