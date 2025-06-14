@@ -10,20 +10,23 @@ import (
 )
 
 type KafkaManager struct {
-	eventListeners []string
-	serviceName    string
-	groupId        string
-	mutex          sync.RWMutex
-	isRunning      bool
-	cancel         context.CancelFunc
+	eventListeners  []string
+	serviceName     string
+	groupId         string
+	mutex           sync.RWMutex
+	isRunning       bool
+	cancel          context.CancelFunc
+	consumerHandler sarama.ConsumerGroupHandler
 }
 
-func NewKafkaManager(serviceName, groupId string, eventListeners []string) *KafkaManager {
+func NewKafkaManager(serviceName, groupId string, eventListeners []string, consumerHandler sarama.ConsumerGroupHandler) *KafkaManager {
 	return &KafkaManager{
-		eventListeners: eventListeners,
-		serviceName:    serviceName,
-		groupId:        groupId,
-		isRunning:      false,
+		eventListeners:  eventListeners,
+		serviceName:     serviceName,
+		groupId:         groupId,
+		isRunning:       false,
+		consumerHandler: consumerHandler,
+		mutex:           sync.RWMutex{},
 	}
 }
 
@@ -38,7 +41,7 @@ func (km *KafkaManager) Start(ctx context.Context) {
 	kafkaCtx, cancel := context.WithCancel(ctx)
 	km.cancel = cancel
 
-	go LaunchKafkaClient(kafkaCtx, km.serviceName, km.groupId, km.eventListeners)
+	go LaunchKafkaClient(kafkaCtx, km.serviceName, km.groupId, km.eventListeners, km.consumerHandler)
 	km.isRunning = true
 }
 
@@ -69,8 +72,8 @@ func (km *KafkaManager) IsRunning() bool {
 	return km.isRunning
 }
 
-func LaunchKafkaClient(ctx context.Context, service string, groupId string, topicArr []string) {
-	brokers := []string{"localhost:9092"}
+func LaunchKafkaClient(ctx context.Context, service string, groupId string, topicArr []string, consumer sarama.ConsumerGroupHandler) {
+	brokers := []string{"localhost:9092"} // TODO : kafka client url
 
 	config := sarama.NewConfig()
 	config.Version = sarama.V4_0_0_0
@@ -90,7 +93,7 @@ func LaunchKafkaClient(ctx context.Context, service string, groupId string, topi
 	}
 	defer consumerGroup.Close()
 
-	handler := &Consumer{}
+	handler := consumer //&Consumer{}
 
 	topics, err := kafkaAdmin.GetMatchingTopicsBySuffixes(topicArr)
 	if err != nil {

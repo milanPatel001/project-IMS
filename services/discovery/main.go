@@ -58,6 +58,8 @@ func main() {
 func restartServices(s *ServerRegistry) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		// TODO : restart all services, not just a group
+
 		groupName := r.URL.Query().Get("group")
 
 		if groupName != "Inventory" && groupName != "Logging" && groupName != "Ordering" && groupName != "Supplier" {
@@ -73,11 +75,13 @@ func restartServices(s *ServerRegistry) http.HandlerFunc {
 			}
 		}
 
+		w.Write([]byte("Restarted Services Successfully !!"))
+
 	}
 }
 
 func restartRequest(inst ServerInstance) error {
-	url := "http://" + inst.HostName + ":" + inst.Port + "/restart"
+	url := "http://" + inst.HostName + "/restart"
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -121,7 +125,7 @@ func registerService(s *ServerRegistry) http.HandlerFunc {
 		}
 
 		if inst.HostName == "" {
-			inst.HostName = "localhost"
+			inst.HostName = "localhost:" + inst.Port
 		}
 
 		inst.LastSeen = time.Now()
@@ -183,7 +187,7 @@ func heartBeatCheck(ctx context.Context, s *ServerRegistry) {
 
 func heartBeatRequest(inst ServerInstance) error {
 
-	url := "http://" + inst.HostName + ":" + inst.Port + "/ping"
+	url := "http://" + inst.HostName + "/ping"
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

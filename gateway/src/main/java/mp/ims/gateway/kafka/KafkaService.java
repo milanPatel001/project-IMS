@@ -35,9 +35,17 @@ public class KafkaService {
         });
     }
 
+    public void createTenantTopicsForOrg(long id){
+        createTopicIfNotExists(id + ".order_placed");
+        createTopicIfNotExists(id + ".order_fulfilled");
+        createTopicIfNotExists(id + ".order_cancelled");
+    }
+
+
     public boolean sendPayload(Long tenantId, String eventType, Object eventPayload){
         return kafkaProducer.sendEvent(String.valueOf(tenantId), eventType, eventPayload);
     }
+
 
     private void createTopicIfNotExists(String topicName) {
         try (var adminClient = AdminClient.create(kafkaAdmin.getConfigurationProperties())){

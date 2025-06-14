@@ -19,7 +19,8 @@ func main() {
 	eventListeners := []string{"order_placed", "order_fulfilled", "order_cancelled"}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	kafkaManager := configs.NewKafkaManager(service, groupId, eventListeners)
+	invConsumer := &InventoryConsumer{}
+	kafkaManager := configs.NewKafkaManager(service, groupId, eventListeners, invConsumer)
 
 	kafkaManager.Start(ctx) // launches a goroutine
 
