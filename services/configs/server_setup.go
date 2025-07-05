@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/jackc/pgx/v5"
 )
 
 type DiscoveryBody struct {
@@ -16,7 +18,7 @@ type DiscoveryBody struct {
 	Port      string `json:"port"`
 }
 
-func SetupHttpServer(ctx context.Context, port string, service string, id string, kafkaManager *KafkaManager, extraHandlers map[string]http.HandlerFunc) {
+func SetupHttpServer(ctx context.Context, port string, service string, id string, kafkaManager *KafkaManager, conn *pgx.Conn, extraHandlers map[string]http.HandlerFunc) {
 
 	err := sendDiscoveryRequest(id, port, service)
 

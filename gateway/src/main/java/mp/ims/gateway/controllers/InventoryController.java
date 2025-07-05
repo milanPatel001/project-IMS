@@ -1,9 +1,13 @@
 package mp.ims.gateway.controllers;
 
+import mp.ims.gateway.DTO.ItemRequestBody;
 import mp.ims.gateway.kafka.KafkaProducer;
 import mp.ims.gateway.kafka.KafkaService;
+import mp.ims.gateway.models.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,4 +26,18 @@ public class InventoryController {
 
         return ResponseEntity.ok(success);
     }
+
+    public ResponseEntity<?> createNewItem(@RequestBody ItemRequestBody itemRequestBody) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails c = (CustomUserDetails) authentication.getPrincipal();
+
+        boolean messageSent = kafkaService.sendPayload(c.getOrgId(), "order_placed", itemRequestBody);
+
+        if(!messageSent) ResponseEntity.status(500).body("Not sent");
+
+        return ResponseEntity.ok("Done");
+    }
+
+
 }

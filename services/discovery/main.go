@@ -168,12 +168,14 @@ func heartBeatCheck(ctx context.Context, s *ServerRegistry) {
 					}
 
 					err := heartBeatRequest(instance)
+					s.Mutex.Lock()
 					if err != nil {
 						s.Map[group][index].isAlive = false
 						log.Println(err)
 					} else {
 						s.Map[group][index].LastSeen = time.Now()
 					}
+					s.Mutex.Unlock()
 				}
 
 			}

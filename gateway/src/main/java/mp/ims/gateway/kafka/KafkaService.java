@@ -43,7 +43,8 @@ public class KafkaService {
 
 
     public boolean sendPayload(Long tenantId, String eventType, Object eventPayload){
-        return kafkaProducer.sendEvent(String.valueOf(tenantId), eventType, eventPayload);
+        String t = String.valueOf(tenantId);
+        return kafkaProducer.sendEvent(t, t + "." + eventType, eventPayload);
     }
 
 

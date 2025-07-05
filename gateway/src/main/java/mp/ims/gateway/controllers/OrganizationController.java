@@ -39,6 +39,7 @@ public class OrganizationController {
 
         String key = organizationService.insertOrg(organizationRequestBody);
 
+        // TODO
         String discoveryUrl = "http://localhost:8000/restart";
 
         String response = restTemplate.getForObject(discoveryUrl, String.class);
